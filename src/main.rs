@@ -11,6 +11,7 @@ use std::{
     io::{self, Read},
 };
 
+mod next;
 mod render;
 mod sort;
 mod utils;
@@ -56,7 +57,7 @@ fn main() -> Result<(), Error> {
     let doc = comrak::parse_document(&arena, &buf, &opts);
 
     if matches.is_present("next") {
-        println!("next not implemented");
+        next::start_next_day(&arena, doc);
     } else {
         sort::sort_tasks(doc);
     }

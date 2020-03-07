@@ -1,4 +1,41 @@
-use comrak::nodes::{AstNode, NodeList, NodeValue};
+use comrak::{
+    nodes::{Ast, AstNode, ListType, NodeHeading, NodeList, NodeValue},
+    Arena,
+};
+use core::cell::RefCell;
+
+/// Construct a heading of the given level.
+pub fn make_heading<'a>(arena: &'a Arena<AstNode<'a>>, level: u32, text: &str) -> &'a AstNode<'a> {
+    let text = {
+        let mut buf = Vec::new();
+        buf.extend(text.as_bytes());
+        let ast = Ast::new(NodeValue::Text(buf));
+        arena.alloc(AstNode::new(RefCell::new(ast)))
+    };
+
+    let heading = {
+        let mut heading = NodeHeading::default();
+        heading.level = level;
+
+        let ast = Ast::new(NodeValue::Heading(heading));
+        arena.alloc(AstNode::new(RefCell::new(ast)))
+    };
+
+    heading.append(text);
+
+    heading
+}
+
+/// Construct a list node.
+pub fn make_bullet_list<'a>(arena: &'a Arena<AstNode<'a>>, bullet: u8) -> &'a AstNode<'a> {
+
+    let mut ty = NodeList::default();
+    ty.list_type = ListType::Bullet;
+    ty.bullet_char = bullet;
+
+    let ast = Ast::new(NodeValue::List(ty));
+    arena.alloc(AstNode::new(RefCell::new(ast)))
+}
 
 /// Returns the bullet point if the given node represents a list.
 pub fn is_list<'a>(node: &'a AstNode<'a>) -> Option<NodeList> {
@@ -15,7 +52,7 @@ pub fn is_todo<'a>(node: &'a AstNode<'a>) -> bool {
         if let Some(par) = node.first_child() {
             for child in par.children() {
                 if let NodeValue::TaskItem(b) = child.data.borrow().value {
-                    return !b
+                    return !b;
                 }
             }
         }
