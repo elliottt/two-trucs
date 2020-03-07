@@ -56,10 +56,10 @@ fn main() -> Result<(), Error> {
 
     let doc = comrak::parse_document(&arena, &buf, &opts);
 
+    sort::sort_tasks(doc);
+
     if matches.is_present("next") {
-        next::start_next_day(&arena, doc);
-    } else {
-        sort::sort_tasks(doc);
+        next::start_next_day(&arena, doc)?;
     }
 
     render::render_document(doc, &opts, &mut io::stdout())?;

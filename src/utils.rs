@@ -28,13 +28,21 @@ pub fn make_heading<'a>(arena: &'a Arena<AstNode<'a>>, level: u32, text: &str) -
 
 /// Construct a list node.
 pub fn make_bullet_list<'a>(arena: &'a Arena<AstNode<'a>>, bullet: u8) -> &'a AstNode<'a> {
-
     let mut ty = NodeList::default();
     ty.list_type = ListType::Bullet;
     ty.bullet_char = bullet;
 
     let ast = Ast::new(NodeValue::List(ty));
     arena.alloc(AstNode::new(RefCell::new(ast)))
+}
+
+/// Returns true if the node is a heading.
+pub fn is_heading<'a>(node: &'a AstNode<'a>) -> Option<NodeHeading> {
+    if let NodeValue::Heading(heading) = node.data.borrow().value {
+        Some(heading)
+    } else {
+        None
+    }
 }
 
 /// Returns the bullet point if the given node represents a list.
