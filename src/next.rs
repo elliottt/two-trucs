@@ -3,9 +3,11 @@ use failure::Error;
 
 use crate::utils;
 
+/// Introduce a new top-level heading, and migrate all unfinished tasks underneath it.
 pub fn start_next_day<'a>(
     arena: &'a Arena<AstNode<'a>>,
     doc: &'a AstNode<'a>,
+    day_title: &str,
 ) -> Result<(), Error> {
     let mut moved: Vec<&'a AstNode<'a>> = Vec::new();
 
@@ -44,7 +46,8 @@ pub fn start_next_day<'a>(
         }
     }
 
-    doc.prepend(utils::make_heading(arena, 1, "Today"));
+
+    doc.prepend(utils::make_heading(arena, 1, day_title));
 
     Ok(())
 }

@@ -2,6 +2,7 @@ use comrak::nodes::AstNode;
 
 use crate::utils;
 
+/// Bubble all unfinished tasks up to the top of each todo list encountered.
 pub fn sort_tasks<'a>(doc: &'a AstNode<'a>) {
     for child in doc.children() {
         if utils::is_list(child).is_some() {

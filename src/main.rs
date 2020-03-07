@@ -28,6 +28,13 @@ fn main() -> Result<(), Error> {
                 .help("Start a new day"),
         )
         .arg(
+            Arg::with_name("title")
+            .short("t")
+            .long("title")
+            .takes_value(true)
+            .default_value("Today")
+            .help("Set the title for the new day"))
+        .arg(
             Arg::with_name("input")
                 .index(1)
                 .help("The TODO file to process"),
@@ -59,7 +66,7 @@ fn main() -> Result<(), Error> {
     sort::sort_tasks(doc);
 
     if matches.is_present("next") {
-        next::start_next_day(&arena, doc)?;
+        next::start_next_day(&arena, doc, matches.value_of("title").unwrap())?;
     }
 
     render::render_document(doc, &opts, &mut io::stdout())?;
