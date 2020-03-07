@@ -2,27 +2,23 @@ use comrak::nodes::{AstNode, NodeList, NodeValue};
 
 /// Returns the bullet point if the given node represents a list.
 pub fn is_list<'a>(node: &'a AstNode<'a>) -> Option<NodeList> {
-    match node.data.borrow().value {
-        NodeValue::List(ty) => Some(ty),
-        _ => None,
+    if let NodeValue::List(ty) = node.data.borrow().value {
+        Some(ty)
+    } else {
+        None
     }
 }
 
 /// Returns true when this node is a task list item that is not complete.
 pub fn is_todo<'a>(node: &'a AstNode<'a>) -> bool {
-    match node.data.borrow().value {
-        NodeValue::Item(_) => {
-            if let Some(par) = node.first_child() {
-                for child in par.children() {
-                    match child.data.borrow().value {
-                        NodeValue::TaskItem(b) => return !b,
-                        _ => (),
-                    }
+    if let NodeValue::Item(_) = node.data.borrow().value {
+        if let Some(par) = node.first_child() {
+            for child in par.children() {
+                if let NodeValue::TaskItem(b) = child.data.borrow().value {
+                    return !b
                 }
             }
         }
-
-        _ => (),
     }
 
     false
