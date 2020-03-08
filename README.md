@@ -5,6 +5,8 @@
 > faire, "I have things to do." truc means 'thingamajig', basically.
 >
 > Anyway, you should call your tool `two-trucs`.
+>
+> -- [getty](https://twitter.com/aisamanra)
 
 `two-trucs` is a tool for managing a grouped todo list written in markdown. For
 example, if you have the following markdown:
