@@ -15,6 +15,7 @@ pub fn start_next_day<'a>(
         if let Some(ty) = utils::is_list(node) {
             let mut todos = Vec::new();
             for child in node.children() {
+                println!("child: {:?}", child);
                 if utils::is_todo(child) {
                     child.detach();
                     todos.push(child)
@@ -30,7 +31,9 @@ pub fn start_next_day<'a>(
                     }
                 }
 
-                let list = utils::make_bullet_list(arena, ty.bullet_char);
+                println!("ty: {:?}", ty);
+
+                let list = utils::make_list(arena, ty);
                 for todo in todos {
                     list.append(todo);
                 }

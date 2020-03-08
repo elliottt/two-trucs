@@ -1,5 +1,5 @@
 use comrak::{
-    nodes::{Ast, AstNode, ListType, NodeHeading, NodeList, NodeValue},
+    nodes::{Ast, AstNode, NodeHeading, NodeList, NodeValue},
     Arena,
 };
 use core::cell::RefCell;
@@ -27,11 +27,7 @@ pub fn make_heading<'a>(arena: &'a Arena<AstNode<'a>>, level: u32, text: &str) -
 }
 
 /// Construct a list node.
-pub fn make_bullet_list<'a>(arena: &'a Arena<AstNode<'a>>, bullet: u8) -> &'a AstNode<'a> {
-    let mut ty = NodeList::default();
-    ty.list_type = ListType::Bullet;
-    ty.bullet_char = bullet;
-
+pub fn make_list<'a>(arena: &'a Arena<AstNode<'a>>, ty: NodeList) -> &'a AstNode<'a> {
     let ast = Ast::new(NodeValue::List(ty));
     arena.alloc(AstNode::new(RefCell::new(ast)))
 }
