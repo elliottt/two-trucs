@@ -30,8 +30,9 @@ fn make_list<'a>(opt: Option<u64>, children: Doc<'a>) -> Node<'a> {
 
 fn collect_unfinished<'a>(doc: &mut Doc<'a>, front: &mut Doc<'a>) {
     let mut last_header = None;
+    let mut remove_indexes = Vec::new();
 
-    for child in doc {
+    for (i, child) in doc.iter_mut().enumerate() {
         match child {
             Node::Node {
                 tag: Tag::Heading(n),
@@ -55,7 +56,11 @@ fn collect_unfinished<'a>(doc: &mut Doc<'a>, front: &mut Doc<'a>) {
                     }
                 }
 
-                std::mem::swap(&mut done, children);
+                if done.is_empty() {
+                    remove_indexes.push(i);
+                } else {
+                    std::mem::swap(&mut done, children);
+                }
 
                 if !todos.is_empty() {
                     if let Some(hdr) = last_header.take() {
@@ -68,6 +73,10 @@ fn collect_unfinished<'a>(doc: &mut Doc<'a>, front: &mut Doc<'a>) {
 
             _ => {}
         }
+    }
+
+    for i in remove_indexes.into_iter().rev() {
+        doc.remove(i);
     }
 }
 
