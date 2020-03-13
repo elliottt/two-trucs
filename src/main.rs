@@ -55,10 +55,11 @@ fn main() -> Result<(), Error> {
     }
 
     let mut doc = parse::DocBuilder::from(Parser::new_ext(&input, Options::all())).build();
-    sort::sort_tasks(&mut doc);
 
     if matches.is_present("next") {
         next::start_next_day(&mut doc, matches.value_of("title").unwrap())
+    } else {
+        sort::sort_tasks(&mut doc)
     }
 
     render::render_document(&doc, &mut io::stdout())?;
