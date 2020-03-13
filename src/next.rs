@@ -1,53 +1,84 @@
-use comrak::{nodes::AstNode, Arena};
-use failure::Error;
-
-use crate::utils;
+use crate::parse::{Doc, Node, Tag};
 
 /// Introduce a new top-level heading, and migrate all unfinished tasks underneath it.
-pub fn start_next_day<'a>(
-    arena: &'a Arena<AstNode<'a>>,
-    doc: &'a AstNode<'a>,
-    day_title: &str,
-) -> Result<(), Error> {
-    let mut moved: Vec<&'a AstNode<'a>> = Vec::new();
+pub fn start_next_day<'a>(doc: &mut Doc<'a>, day_title: &str) {
+    let mut front = Vec::new();
 
-    for node in doc.children() {
-        if let Some(ty) = utils::is_list(node) {
-            let mut todos = Vec::new();
-            for child in node.children() {
-                if utils::is_todo(child) {
-                    child.detach();
-                    todos.push(child)
-                }
+    front.push(make_next_day(day_title));
+
+    collect_unfinished(doc, &mut front);
+
+    front.append(doc);
+
+    std::mem::swap(&mut front, doc)
+}
+
+fn make_next_day<'a>(day_title: &str) -> Node<'a> {
+    let tag = Tag::Heading(1);
+    let text = Node::Text(String::from(day_title).into());
+
+    Node::Node {
+        tag,
+        children: vec![text],
+    }
+}
+
+fn make_list<'a>(opt: Option<u64>, children: Doc<'a>) -> Node<'a> {
+    let tag = Tag::List(opt);
+    Node::Node { tag, children }
+}
+
+fn collect_unfinished<'a>(doc: &mut Doc<'a>, front: &mut Doc<'a>) {
+    let mut last_header = None;
+
+    for child in doc {
+        match child {
+            Node::Node {
+                tag: Tag::Heading(n),
+                ..
+            } if *n > 1 => {
+                last_header = Some(child);
             }
 
-            if !todos.is_empty() {
-                if let Some(pre) = node.previous_sibling() {
-                    if let Some(heading) = utils::is_heading(pre) {
-                        let bytes = &pre.data.borrow().content;
-                        let text = std::str::from_utf8(bytes)?;
-                        moved.push(utils::make_heading(arena, heading.level, text));
+            Node::Node {
+                tag: Tag::List(opt),
+                children,
+            } => {
+                let mut todos = Vec::new();
+                let mut done = Vec::new();
+
+                for child in children.drain(0..) {
+                    if has_outstanding_todo(&child) {
+                        todos.push(child);
+                    } else {
+                        done.push(child);
                     }
                 }
 
-                let list = utils::make_list(arena, ty);
-                for todo in todos {
-                    list.append(todo);
+                std::mem::swap(&mut done, children);
+
+                if !todos.is_empty() {
+                    if let Some(hdr) = last_header.take() {
+                        front.push(hdr.clone());
+                    }
+
+                    front.push(make_list(opt.clone(), todos));
                 }
-
-                moved.push(list)
             }
+
+            _ => {}
         }
     }
+}
 
-    if !moved.is_empty() {
-        for node in moved.iter().rev() {
-            doc.prepend(node);
+fn has_outstanding_todo<'a>(node: &Node<'a>) -> bool {
+    if let Some(false) = node.is_todo() {
+        true
+    } else {
+        match node {
+            Node::Node { children, .. } => children.iter().any(has_outstanding_todo),
+
+            _ => false,
         }
     }
-
-
-    doc.prepend(utils::make_heading(arena, 1, day_title));
-
-    Ok(())
 }

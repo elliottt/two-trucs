@@ -8,6 +8,8 @@
 >
 > -- [getty](https://twitter.com/aisamanra)
 
+## Introduction
+
 `two-trucs` is a tool for managing a grouped todo list written in markdown. For
 example, if you have the following markdown:
 
@@ -59,3 +61,15 @@ Running `two-trucs -n` on the file will give you:
 
 If you are starting a new day, you can alter the default heading of "Today" by
 passing `-t "My alternate title"`.
+
+## Vim plugin
+
+You can use `two-trucs` with vim by using this repository as a plugin. For
+[vim-plug](https://github.com/junegunn/vim-plug), just add the following to your
+config:
+
+```vim
+Plug 'elliottt/two-trucs', { 'do': 'make release' }
+```
+
+The plugin comes with two commands

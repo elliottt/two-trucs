@@ -1,10 +1,11 @@
 extern crate clap;
 extern crate comrak;
 extern crate failure;
+extern crate pulldown_cmark;
 
 use clap::{App, Arg};
-use comrak::{Arena, ComrakOptions};
 use failure::Error;
+use pulldown_cmark::{Options, Parser};
 
 use std::{
     fs::File,
@@ -12,9 +13,9 @@ use std::{
 };
 
 mod next;
+mod parse;
 mod render;
 mod sort;
-mod utils;
 
 fn main() -> Result<(), Error> {
     let matches = App::new("updo")
@@ -29,11 +30,12 @@ fn main() -> Result<(), Error> {
         )
         .arg(
             Arg::with_name("title")
-            .short("t")
-            .long("title")
-            .takes_value(true)
-            .default_value("Today")
-            .help("Set the title for the new day"))
+                .short("t")
+                .long("title")
+                .takes_value(true)
+                .default_value("Today")
+                .help("Set the title for the new day"),
+        )
         .arg(
             Arg::with_name("input")
                 .index(1)
@@ -41,35 +43,25 @@ fn main() -> Result<(), Error> {
         )
         .get_matches();
 
-    let mut buf = String::new();
-    let input = matches.value_of("input");
-    match input {
+    let mut input = String::new();
+    match matches.value_of("input") {
         Some("-") | None => {
-            io::stdin().read_to_string(&mut buf)?;
+            io::stdin().read_to_string(&mut input)?;
         }
         Some(path) => {
             let mut f = File::open(path)?;
-            f.read_to_string(&mut buf)?;
+            f.read_to_string(&mut input)?;
         }
     }
 
-    let arena = Arena::new();
-
-    let opts = {
-        let mut opts = ComrakOptions::default();
-        opts.ext_tasklist = true;
-        opts
-    };
-
-    let doc = comrak::parse_document(&arena, &buf, &opts);
-
-    sort::sort_tasks(doc);
+    let mut doc = parse::DocBuilder::from(Parser::new_ext(&input, Options::all())).build();
+    sort::sort_tasks(&mut doc);
 
     if matches.is_present("next") {
-        next::start_next_day(&arena, doc, matches.value_of("title").unwrap())?;
+        next::start_next_day(&mut doc, matches.value_of("title").unwrap())
     }
 
-    render::render_document(doc, &opts, &mut io::stdout())?;
+    render::render_document(&doc, &mut io::stdout())?;
 
     Ok(())
 }
