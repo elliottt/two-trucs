@@ -1,11 +1,12 @@
 extern crate clap;
-extern crate comrak;
 extern crate failure;
 extern crate pulldown_cmark;
 
+#[cfg(test)]
+extern crate pretty_assertions;
+
 use clap::{App, Arg};
 use failure::Error;
-use pulldown_cmark::{Options, Parser};
 
 use std::{
     fs::File,
@@ -15,6 +16,7 @@ use std::{
 mod next;
 mod parse;
 mod render;
+mod rewrite;
 mod sort;
 
 fn main() -> Result<(), Error> {
@@ -54,15 +56,23 @@ fn main() -> Result<(), Error> {
         }
     }
 
-    let mut doc = parse::DocBuilder::from(Parser::new_ext(&input, Options::all())).build();
-
-    if matches.is_present("next") {
-        next::start_next_day(&mut doc, matches.value_of("title").unwrap())
+    let opt_title = if matches.is_present("next") {
+        matches.value_of("title")
     } else {
-        sort::sort_tasks(&mut doc)
-    }
+        None
+    };
 
-    render::render_document(&doc, &mut io::stdout())?;
+    rewrite::rewrite(opt_title, &input, &mut io::stdout())?;
 
     Ok(())
+}
+
+#[cfg(test)]
+#[macro_use]
+mod testing;
+
+#[cfg(test)]
+mod tests {
+    sort_test!(ident, "tests/ident.md");
+    next_test!(ident_next, "tests/ident.md");
 }
