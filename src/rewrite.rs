@@ -6,7 +6,7 @@ use crate::{next, parse, render, sort};
 
 pub fn rewrite(
     opt_title: Option<&str>,
-    input: &String,
+    input: &str,
     output: &mut dyn Write,
 ) -> Result<(), Error> {
     let mut doc = parse::DocBuilder::from(Parser::new_ext(&input, Options::all())).build();

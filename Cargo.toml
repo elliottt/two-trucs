@@ -4,12 +4,25 @@ version = "0.1.0"
 authors = ["Trevor Elliott <awesomelyawesome@gmail.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 failure = "0.1.7"
 clap = "2.33.0"
 pulldown-cmark = "0.7.0"
 
 [dev-dependencies]
-pretty_assertions = "0.6.1"
+colored-diff = "0.2.2"
+
+[[bin]]
+name = "two-trucs"
+path = "src/main.rs"
+test = false
+
+[lib]
+path = "src/lib.rs"
+test = false
+
+[[test]]
+name = "exp_tests"
+path = "tests/exp_tests.rs"
+test = true
+harness = false

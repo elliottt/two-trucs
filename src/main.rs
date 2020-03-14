@@ -2,9 +2,6 @@ extern crate clap;
 extern crate failure;
 extern crate pulldown_cmark;
 
-#[cfg(test)]
-extern crate pretty_assertions;
-
 use clap::{App, Arg};
 use failure::Error;
 
@@ -13,11 +10,7 @@ use std::{
     io::{self, Read},
 };
 
-mod next;
-mod parse;
-mod render;
-mod rewrite;
-mod sort;
+use two_trucs::rewrite;
 
 fn main() -> Result<(), Error> {
     let matches = App::new("updo")
@@ -65,16 +58,4 @@ fn main() -> Result<(), Error> {
     rewrite::rewrite(opt_title, &input, &mut io::stdout())?;
 
     Ok(())
-}
-
-#[cfg(test)]
-#[macro_use]
-mod testing;
-
-#[cfg(test)]
-mod tests {
-    sort_test!(ident, "tests/ident.md");
-    next_test!(ident_next, "tests/ident.md");
-
-    sort_test!(link, "tests/link.md");
 }
