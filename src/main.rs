@@ -75,4 +75,6 @@ mod testing;
 mod tests {
     sort_test!(ident, "tests/ident.md");
     next_test!(ident_next, "tests/ident.md");
+
+    sort_test!(link, "tests/link.md");
 }

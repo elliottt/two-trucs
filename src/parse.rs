@@ -1,6 +1,6 @@
 use pulldown_cmark::{CowStr, Event, Parser};
 
-pub use pulldown_cmark::{CodeBlockKind, Tag};
+pub use pulldown_cmark::{CodeBlockKind, LinkType, Tag};
 
 pub type Doc<'a> = Vec<Node<'a>>;
 
@@ -86,7 +86,7 @@ impl<'a> PartialNode<'a> {
     }
 }
 
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub enum Node<'a> {
     Node {
         tag: Tag<'a>,

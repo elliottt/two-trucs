@@ -1,7 +1,7 @@
 use failure::Error;
 use std::io::Write;
 
-use crate::parse::{CodeBlockKind, Doc, Node, Tag};
+use crate::parse::{CodeBlockKind, Doc, LinkType, Node, Tag};
 
 /// Render a `Doc` to the given output target.
 pub fn render_document<'a>(doc: &Doc<'a>, output: &mut dyn Write) -> Result<(), Error> {
@@ -291,6 +291,52 @@ impl<'a> Renderer<'a> {
 
                 self.set_sep(sep);
                 self.set_indent(indent);
+            }
+
+            Tag::Link(ty, dest, title) => {
+                let sep = self.set_sep(SepMode::Join);
+
+                match ty {
+                    LinkType::Inline
+                    | LinkType::Reference
+                    | LinkType::Collapsed
+                    | LinkType::Shortcut => {
+                        write!(self.output, "[")?;
+                        self.nl_str(title)?;
+                        self.render_children(children)?;
+                        write!(self.output, "]")?;
+                    }
+
+                    _ => {}
+                }
+
+                match ty {
+                    LinkType::Inline => {
+                        write!(self.output, "(")?;
+                        self.nl_str(dest)?;
+                        write!(self.output, ")")?;
+                    }
+
+                    LinkType::Reference => {
+                        write!(self.output, "(")?;
+                        self.nl_str(dest)?;
+                        write!(self.output, ")")?;
+                    }
+
+                    LinkType::Collapsed => {
+                        write!(self.output, "[]")?;
+                    }
+
+                    LinkType::Autolink | LinkType::Email => {
+                        write!(self.output, "<")?;
+                        self.nl_str(dest)?;
+                        write!(self.output, ">")?;
+                    }
+
+                    _ => {}
+                }
+
+                self.set_sep(sep);
             }
 
             _ => (),
