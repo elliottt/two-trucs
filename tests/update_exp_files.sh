@@ -5,6 +5,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cargo build --quiet
 
 ls data/*.md | while read file; do
+  echo "Updating $file"
+
   dir="$(dirname "$file")"
   name="$(basename "$file")"
 
