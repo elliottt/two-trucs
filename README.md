@@ -14,21 +14,21 @@
 example, if you have the following markdown:
 
 ```markdown
-- [x] Task 1
-- [x] Task 2
-- [ ] Task 3
-- [x] Add bugs
-- [ ] Fix bugs
+* [x] Task 1
+* [x] Task 2
+* [ ] Task 3
+* [x] Add bugs
+* [ ] Fix bugs
 ```
 
 and you run `two-trucs` on it, it will re-order the list to the following:
 
 ```markdown
-- [ ] Task 3
-- [ ] Fix bugs
-- [x] Task 1
-- [x] Task 2
-- [x] Add bugs
+* [ ] Task 3
+* [ ] Fix bugs
+* [x] Task 1
+* [x] Task 2
+* [x] Add bugs
 ```
 
 If you manage these lists by updating them daily, and want to archive the tasks
@@ -39,9 +39,10 @@ flag, instructing it that you are beginning a new day. Given this markdown file:
 # Yesterday
 
 ## Project
-- [x] Finish that thing
-- [ ] Do that other thing
-- [ ] Add bugs
+
+* [x] Finish that thing
+* [ ] Do that other thing
+* [ ] Add bugs
 ```
 
 Running `two-trucs -n` on the file will give you:
@@ -50,13 +51,15 @@ Running `two-trucs -n` on the file will give you:
 # Today
 
 ## Project
-- [ ] Do that other thing
-- [ ] Add bugs
+
+* [ ] Do that other thing
+* [ ] Add bugs
 
 # Yesterday
 
 ## Project
-- [x] Finish that thing
+
+* [x] Finish that thing
 ```
 
 If you are starting a new day, you can alter the default heading of "Today" by
@@ -72,4 +75,7 @@ config:
 Plug 'elliottt/two-trucs', { 'do': 'make release' }
 ```
 
-The plugin comes with two commands
+The plugin comes with two commands:
+
+* `TTSort` which will sort the todo items in place
+* `TTNext` which will start a new day, using a default title of the current date
