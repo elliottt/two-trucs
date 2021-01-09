@@ -9,7 +9,11 @@ pub fn rewrite(
     input: &str,
     output: &mut dyn Write,
 ) -> Result<(), Error> {
-    let mut doc = parse::DocBuilder::from(Parser::new_ext(&input, Options::all())).build();
+    let opts = Options::ENABLE_TABLES |
+        Options::ENABLE_FOOTNOTES |
+        Options::ENABLE_STRIKETHROUGH |
+        Options::ENABLE_TASKLISTS;
+    let mut doc = parse::DocBuilder::from(Parser::new_ext(&input, opts)).build();
 
     if let Some(title) = opt_title {
         next::start_next_day(&mut doc, title)
