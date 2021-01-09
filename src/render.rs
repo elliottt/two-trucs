@@ -209,6 +209,14 @@ impl<'a> Renderer<'a> {
     /// Render a nested node. The tag indicates the type of node that contains the children.
     fn render_nested<'b>(&mut self, tag: &Tag<'b>, children: &Doc<'b>) -> Result<(), Error> {
         match tag {
+            Tag::Paragraph => {
+                let sep = self.set_sep(SepMode::Join);
+
+                self.render_children(children)?;
+
+                self.set_sep(sep);
+            }
+
             Tag::Heading(level) => {
                 let sep = self.set_sep(SepMode::Join);
 
@@ -217,37 +225,6 @@ impl<'a> Renderer<'a> {
                 }
 
                 write!(self.output, " ")?;
-
-                self.render_children(children)?;
-
-                self.set_sep(sep);
-            }
-
-            Tag::List(opt) => {
-                let sep = self.set_sep(SepMode::NewLine);
-                let bullet = self.set_bullet(self.bullet.next(opt));
-
-                self.nested_nl()?;
-
-                self.render_children(children)?;
-
-                self.set_sep(sep);
-                self.set_bullet(bullet);
-            }
-
-            Tag::Item => {
-                let sep = self.set_sep(SepMode::Join);
-                let indent = self.set_indent(self.indent + 1);
-
-                self.bullet.render(self.output)?;
-                self.render_children(children)?;
-
-                self.set_sep(sep);
-                self.set_indent(indent);
-            }
-
-            Tag::Paragraph => {
-                let sep = self.set_sep(SepMode::Join);
 
                 self.render_children(children)?;
 
@@ -291,6 +268,52 @@ impl<'a> Renderer<'a> {
 
                 self.set_sep(sep);
                 self.set_indent(indent);
+            }
+
+            Tag::List(opt) => {
+                let sep = self.set_sep(SepMode::NewLine);
+                let bullet = self.set_bullet(self.bullet.next(opt));
+
+                self.nested_nl()?;
+
+                self.render_children(children)?;
+
+                self.set_sep(sep);
+                self.set_bullet(bullet);
+            }
+
+            Tag::Item => {
+                let sep = self.set_sep(SepMode::Join);
+                let indent = self.set_indent(self.indent + 1);
+
+                self.bullet.render(self.output)?;
+                self.render_children(children)?;
+
+                self.set_sep(sep);
+                self.set_indent(indent);
+            }
+
+            // Tag::FootnoteDefinition
+            // Tag::Table
+            // Tag::TableHead
+            // Tag::TableCell
+
+            Tag::Emphasis => {
+                write!(self.output, "*")?;
+                self.render_children(children)?;
+                write!(self.output, "*")?;
+            }
+
+            Tag::Strong => {
+                write!(self.output, "**")?;
+                self.render_children(children)?;
+                write!(self.output, "**")?;
+            }
+
+            Tag::Strikethrough => {
+                write!(self.output, "~~")?;
+                self.render_children(children)?;
+                write!(self.output, "~~")?;
             }
 
             Tag::Link(ty, dest, title) => {
@@ -338,6 +361,8 @@ impl<'a> Renderer<'a> {
 
                 self.set_sep(sep);
             }
+
+            // Tag::Image
 
             _ => (),
         }
