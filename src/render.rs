@@ -1,7 +1,7 @@
 use failure::Error;
 use std::io::Write;
 
-use crate::parse::{CodeBlockKind, Doc, LinkType, Node, Tag};
+use crate::parse::{CodeBlockKind, Doc, HeadingLevel, LinkType, Node, Tag};
 
 /// Render a `Doc` to the given output target.
 pub fn render_document<'a>(doc: &Doc<'a>, output: &mut dyn Write) -> Result<(), Error> {
@@ -217,14 +217,19 @@ impl<'a> Renderer<'a> {
                 self.set_sep(sep);
             }
 
-            Tag::Heading(level) => {
+            Tag::Heading(level, _, _) => {
                 let sep = self.set_sep(SepMode::Join);
 
-                for _ in 0..1.max(*level) {
-                    write!(self.output, "#")?;
-                }
+                let level = match level {
+                    HeadingLevel::H1 => "#",
+                    HeadingLevel::H2 => "##",
+                    HeadingLevel::H3 => "###",
+                    HeadingLevel::H4 => "####",
+                    HeadingLevel::H5 => "#####",
+                    HeadingLevel::H6 => "######",
+                };
 
-                write!(self.output, " ")?;
+                write!(self.output, "{} ", level)?;
 
                 self.render_children(children)?;
 

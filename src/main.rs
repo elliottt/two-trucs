@@ -1,8 +1,4 @@
-extern crate clap;
-extern crate failure;
-extern crate pulldown_cmark;
-
-use clap::{App, Arg};
+use clap::Parser;
 use failure::Error;
 
 use std::{
@@ -12,41 +8,37 @@ use std::{
 
 use two_trucs::rewrite;
 
-fn open_input(input: Option<&str>) -> io::Result<Box<dyn Read>> {
-    let handle: Box<dyn Read> = match input {
+fn open_input(input: Option<&String>) -> io::Result<Box<dyn Read>> {
+    let handle: Box<dyn Read> = match input.map(String::as_str) {
         Some("-") | None => Box::new(io::stdin()),
         Some(file) => Box::new(File::open(file)?),
     };
     Ok(handle)
 }
 
-fn main() -> Result<(), Error> {
-    let matches = App::new("updo")
-        .version("0.1.0")
-        .author("Trevor Elliott")
-        .about("Markdown TODO list maintainer")
-        .arg(
-            Arg::with_name("next")
-                .short("n")
-                .long("next")
-                .help("Start a new day"),
-        )
-        .arg(
-            Arg::with_name("title")
-                .short("t")
-                .long("title")
-                .takes_value(true)
-                .default_value("Today")
-                .help("Set the title for the new day"),
-        )
-        .arg(
-            Arg::with_name("input")
-                .index(1)
-                .help("The TODO file to process"),
-        )
-        .get_matches();
+#[derive(Parser, Debug)]
+#[command(
+    author = "Trevor Elliott",
+    version = "0.1.0",
+    about = "Markdown TODO list maintainer"
+)]
+struct Options {
+    #[arg(short = 'n')]
+    next: bool,
 
-    let mut handle = open_input(matches.value_of("input"))?;
+    #[arg(short = 's')]
+    sort: bool,
+
+    #[arg(short = 't', default_value = "Today")]
+    title: String,
+
+    input: Option<String>,
+}
+
+fn main() -> Result<(), Error> {
+    let options = Options::parse();
+
+    let mut handle = open_input(options.input.as_ref())?;
 
     let input = {
         let mut buf = String::new();
@@ -54,8 +46,8 @@ fn main() -> Result<(), Error> {
         buf
     };
 
-    let opt_title = if matches.is_present("next") {
-        matches.value_of("title")
+    let opt_title = if options.next {
+        Some(options.title)
     } else {
         None
     };

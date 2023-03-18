@@ -1,4 +1,4 @@
-use crate::parse::{Doc, Node, Tag};
+use crate::parse::{Doc, HeadingLevel, Node, Tag};
 
 /// Introduce a new top-level heading, and migrate all unfinished tasks underneath it.
 pub fn start_next_day<'a>(doc: Doc<'a>, day_title: &str) -> Doc<'a> {
@@ -11,7 +11,7 @@ pub fn start_next_day<'a>(doc: Doc<'a>, day_title: &str) -> Doc<'a> {
 }
 
 fn make_next_day<'a>(day_title: &str) -> Node<'a> {
-    let tag = Tag::Heading(1);
+    let tag = Tag::Heading(HeadingLevel::H1, None, vec![]);
     let text = Node::Text(String::from(day_title).into());
 
     Node::Node {
@@ -26,13 +26,13 @@ fn make_list<'a>(opt: Option<u64>, children: Doc<'a>) -> Node<'a> {
 }
 
 struct Level {
-    heading: u32,
+    heading: HeadingLevel,
     had_todo: bool,
     index: usize,
 }
 
 impl Level {
-    fn new(heading: u32, index: usize) -> Self {
+    fn new(heading: HeadingLevel, index: usize) -> Self {
         Self {
             heading,
             had_todo: false,
@@ -51,7 +51,7 @@ struct Buffer<'a> {
 impl<'a> Buffer<'a> {
     fn new() -> Self {
         Self {
-            levels: vec![Level::new(1, 0)],
+            levels: vec![Level::new(HeadingLevel::H1, 0)],
             buf: Vec::new(),
             next: Vec::new(),
             old: Vec::new(),
@@ -62,7 +62,7 @@ impl<'a> Buffer<'a> {
         self.levels.last_mut().unwrap()
     }
 
-    fn push_level(&mut self, heading: u32) {
+    fn push_level(&mut self, heading: HeadingLevel) {
         self.levels.push(Level::new(heading, self.buf.len()));
     }
 
@@ -83,7 +83,7 @@ impl<'a> Buffer<'a> {
         self.buf.push(node);
     }
 
-    fn flush(&mut self, heading: u32) {
+    fn flush(&mut self, heading: HeadingLevel) {
         if heading > self.level().heading {
             return;
         }
@@ -131,7 +131,7 @@ impl<'a> Buffer<'a> {
 
                     // Headings are unconditionally duplicated.
                     Node::Node {
-                        tag: Tag::Heading(_),
+                        tag: Tag::Heading(_, _, _),
                         ..
                     } => {
                         self.next.push(node.clone());
@@ -152,7 +152,7 @@ impl<'a> Buffer<'a> {
     }
 
     fn to_doc(mut self) -> Doc<'a> {
-        self.flush(0);
+        self.flush(HeadingLevel::H1);
         self.next.extend(self.old.drain(..));
         self.next
     }
@@ -161,7 +161,7 @@ impl<'a> Buffer<'a> {
 fn collect_unfinished<'a>(buf: &mut Buffer<'a>, doc: Doc<'a>) {
     for child in doc {
         if let Node::Node {
-            tag: Tag::Heading(n),
+            tag: Tag::Heading(n, _, _),
             ..
         } = child
         {

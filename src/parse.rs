@@ -1,6 +1,6 @@
 use pulldown_cmark::{CowStr, Event, Parser};
 
-pub use pulldown_cmark::{CodeBlockKind, LinkType, Tag};
+pub use pulldown_cmark::{CodeBlockKind, HeadingLevel, LinkType, Tag};
 
 pub type Doc<'a> = Vec<Node<'a>>;
 
@@ -17,7 +17,7 @@ impl<'a> DocBuilder<'a> {
         }
     }
 
-    pub fn from(parser: Parser<'a>) -> Self {
+    pub fn from(parser: Parser<'a, 'a>) -> Self {
         let mut builder = Self::new();
 
         for event in parser {

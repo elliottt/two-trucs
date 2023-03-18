@@ -91,7 +91,7 @@ fn test_next(path: &std::path::Path, input: &str, exp: &std::path::Path) -> Resu
     let expected = &std::fs::read_to_string(exp)?;
     compare_output(
         &format!("next: {}", path.display()),
-        Some("Today"),
+        Some(String::from("Today")),
         input,
         expected,
     )
@@ -99,7 +99,7 @@ fn test_next(path: &std::path::Path, input: &str, exp: &std::path::Path) -> Resu
 
 fn compare_output(
     test_name: &str,
-    opt_title: Option<&str>,
+    opt_title: Option<String>,
     input: &str,
     expected: &str,
 ) -> Result<bool, Error> {

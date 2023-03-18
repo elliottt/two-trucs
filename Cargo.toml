@@ -6,8 +6,8 @@ edition = "2018"
 
 [dependencies]
 failure = "0.1.8"
-clap = "2.33.3"
-pulldown-cmark = "0.8.0"
+clap = { version = "4.1.10", features = ["derive"] }
+pulldown-cmark = "0.9.2"
 
 [dev-dependencies]
 colored-diff = "0.2.2"
