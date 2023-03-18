@@ -3,12 +3,17 @@
 
 ## First
 
+This illustrates how `C` will bubble up to the next day, because it contains a
+sub-list with unfinished tasks.
+
 * [ ] A
   * [ ] X
 * [x] C
   * [ ] Y
 
 ## Second
+
+This illustrates how all unfinished items are bubbled-up during `next`.
 
 * [ ] 2
 
@@ -20,16 +25,11 @@
 
 ## First
 
-This illustrates how `C` will bubble up to the next day, because it contains a
-sub-list with unfinished tasks.
-
 * [x] B
 
 # Other List
 
 ## Second
-
-This illustrates how all unfinished items are bubbled-up during `next`.
 
 * [x] 1
 

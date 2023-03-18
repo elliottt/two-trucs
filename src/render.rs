@@ -297,7 +297,6 @@ impl<'a> Renderer<'a> {
             // Tag::Table
             // Tag::TableHead
             // Tag::TableCell
-
             Tag::Emphasis => {
                 write!(self.output, "*")?;
                 self.render_children(children)?;
@@ -363,7 +362,6 @@ impl<'a> Renderer<'a> {
             }
 
             // Tag::Image
-
             _ => (),
         }
 

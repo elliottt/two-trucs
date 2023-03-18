@@ -12,6 +12,14 @@ use std::{
 
 use two_trucs::rewrite;
 
+fn open_input(input: Option<&str>) -> io::Result<Box<dyn Read>> {
+    let handle: Box<dyn Read> = match input {
+        Some("-") | None => Box::new(io::stdin()),
+        Some(file) => Box::new(File::open(file)?),
+    };
+    Ok(handle)
+}
+
 fn main() -> Result<(), Error> {
     let matches = App::new("updo")
         .version("0.1.0")
@@ -38,16 +46,13 @@ fn main() -> Result<(), Error> {
         )
         .get_matches();
 
-    let mut input = String::new();
-    match matches.value_of("input") {
-        Some("-") | None => {
-            io::stdin().read_to_string(&mut input)?;
-        }
-        Some(path) => {
-            let mut f = File::open(path)?;
-            f.read_to_string(&mut input)?;
-        }
-    }
+    let mut handle = open_input(matches.value_of("input"))?;
+
+    let input = {
+        let mut buf = String::new();
+        handle.read_to_string(&mut buf)?;
+        buf
+    };
 
     let opt_title = if matches.is_present("next") {
         matches.value_of("title")

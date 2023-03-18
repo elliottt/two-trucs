@@ -56,7 +56,11 @@ fn exp_test(path: &std::path::Path) -> Result<bool, Error> {
         if sort.exists() {
             test_sort(&path, &source, &sort)?
         } else {
-            println!("Missing sort expectaiton for {} in {}", path.display(), sort.display());
+            println!(
+                "Missing sort expectaiton for {} in {}",
+                path.display(),
+                sort.display()
+            );
             false
         }
     };
@@ -66,7 +70,11 @@ fn exp_test(path: &std::path::Path) -> Result<bool, Error> {
         if next.exists() {
             test_next(&path, &source, &next)?
         } else {
-            println!("Missing next expectation for {} in {}", path.display(), next.display());
+            println!(
+                "Missing next expectation for {} in {}",
+                path.display(),
+                next.display()
+            );
             false
         }
     };
@@ -81,7 +89,12 @@ fn test_sort(path: &std::path::Path, input: &str, exp: &std::path::Path) -> Resu
 
 fn test_next(path: &std::path::Path, input: &str, exp: &std::path::Path) -> Result<bool, Error> {
     let expected = &std::fs::read_to_string(exp)?;
-    compare_output(&format!("next: {}", path.display()), Some("Today"), input, expected)
+    compare_output(
+        &format!("next: {}", path.display()),
+        Some("Today"),
+        input,
+        expected,
+    )
 }
 
 fn compare_output(
