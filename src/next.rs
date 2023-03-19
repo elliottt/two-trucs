@@ -93,10 +93,6 @@ impl<'a> Buffer<'a> {
         let start_next = self.next.len();
         let start_old = self.old.len();
         for level in self.levels.iter().rev() {
-            if level.heading < heading {
-                break;
-            }
-
             if !level.had_todo {
                 self.old.extend(self.buf.drain(level.index..).rev());
                 continue;
@@ -146,7 +142,7 @@ impl<'a> Buffer<'a> {
             }
         }
 
-        self.levels.retain(|l| l.heading < heading);
+        self.levels.clear();
         self.next[start_next..].reverse();
         self.old[start_old..].reverse();
     }

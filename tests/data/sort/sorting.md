@@ -21,10 +21,21 @@ This illustrates how all unfinished items are bubbled-up during `next`.
 * [ ] 2
 * [x] 1
 
+## Third
+
+Here's a second todo list
+
+* [ ] B
+* [x] A
+
 # Bugs
 
 This shows how empty list headings aren't removed when all list items get moved
 
 ## Empty Header
+
+* [ ] Bug case
+
+## Second List
 
 * [ ] Bug case

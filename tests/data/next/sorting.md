@@ -17,7 +17,17 @@ This illustrates how all unfinished items are bubbled-up during `next`.
 
 * [ ] 2
 
+## Third
+
+Here's a second todo list
+
+* [ ] B
+
 ## Empty Header
+
+* [ ] Bug case
+
+## Second List
 
 * [ ] Bug case
 
@@ -33,8 +43,14 @@ This illustrates how all unfinished items are bubbled-up during `next`.
 
 * [x] 1
 
+## Third
+
+* [x] A
+
 # Bugs
 
 This shows how empty list headings aren't removed when all list items get moved
 
 ## Empty Header
+
+## Second List
