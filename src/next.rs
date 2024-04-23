@@ -11,7 +11,12 @@ pub fn start_next_day<'a>(doc: Doc<'a>, day_title: &str) -> Doc<'a> {
 }
 
 fn make_next_day<'a>(day_title: &str) -> Node<'a> {
-    let tag = Tag::Heading(HeadingLevel::H1, None, vec![]);
+    let tag = Tag::Heading {
+        level: HeadingLevel::H1,
+        id: None,
+        classes: vec![],
+        attrs: vec![],
+    };
     let text = Node::Text(String::from(day_title).into());
 
     Node::Node {
@@ -127,7 +132,7 @@ impl<'a> Buffer<'a> {
 
                     // Headings are unconditionally duplicated.
                     Node::Node {
-                        tag: Tag::Heading(_, _, _),
+                        tag: Tag::Heading { .. },
                         ..
                     } => {
                         self.next.push(node.clone());
@@ -157,7 +162,7 @@ impl<'a> Buffer<'a> {
 fn collect_unfinished<'a>(buf: &mut Buffer<'a>, doc: Doc<'a>) {
     for child in doc {
         if let Node::Node {
-            tag: Tag::Heading(n, _, _),
+            tag: Tag::Heading { level: n, .. },
             ..
         } = child
         {

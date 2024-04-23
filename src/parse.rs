@@ -17,7 +17,7 @@ impl<'a> DocBuilder<'a> {
         }
     }
 
-    pub fn from(parser: Parser<'a, 'a>) -> Self {
+    pub fn from(parser: Parser<'a>) -> Self {
         let mut builder = Self::new();
 
         for event in parser {
@@ -32,6 +32,7 @@ impl<'a> DocBuilder<'a> {
                 Event::SoftBreak => builder.push(Node::SoftBreak),
                 Event::Rule => builder.push(Node::Rule),
                 Event::TaskListMarker(b) => builder.push(Node::TaskListMarker(b)),
+                Event::InlineHtml(html) => builder.push(Node::Html(html)),
             }
         }
 

@@ -217,7 +217,7 @@ impl<'a> Renderer<'a> {
                 self.set_sep(sep);
             }
 
-            Tag::Heading(level, _, _) => {
+            Tag::Heading { level, .. } => {
                 let sep = self.set_sep(SepMode::Join);
 
                 let level = match level {
@@ -320,7 +320,12 @@ impl<'a> Renderer<'a> {
                 write!(self.output, "~~")?;
             }
 
-            Tag::Link(ty, dest, title) => {
+            Tag::Link {
+                link_type: ty,
+                dest_url: dest,
+                title,
+                ..
+            } => {
                 let sep = self.set_sep(SepMode::Join);
 
                 match ty {
