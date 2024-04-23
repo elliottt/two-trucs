@@ -1,4 +1,3 @@
-use failure::Error;
 use pulldown_cmark::{Options, Parser};
 use std::io::Write;
 
@@ -8,7 +7,7 @@ pub fn rewrite(
     opt_title: Option<String>,
     input: &str,
     output: &mut dyn Write,
-) -> Result<(), Error> {
+) -> anyhow::Result<()> {
     let opts = Options::ENABLE_TABLES
         | Options::ENABLE_FOOTNOTES
         | Options::ENABLE_STRIKETHROUGH

@@ -1,10 +1,9 @@
-use failure::Error;
 use std::io::Write;
 
 use crate::parse::{CodeBlockKind, Doc, HeadingLevel, LinkType, Node, Tag};
 
 /// Render a `Doc` to the given output target.
-pub fn render_document<'a>(doc: &Doc<'a>, output: &mut dyn Write) -> Result<(), Error> {
+pub fn render_document<'a>(doc: &Doc<'a>, output: &mut dyn Write) -> anyhow::Result<()> {
     writeln!(output, "")?;
     Renderer::new(output).render_children(doc)?;
     writeln!(output, "")?;
@@ -34,7 +33,7 @@ impl BulletMode {
         }
     }
 
-    fn render(&mut self, output: &mut dyn Write) -> Result<(), Error> {
+    fn render(&mut self, output: &mut dyn Write) -> anyhow::Result<()> {
         match self {
             BulletMode::Char(c) => write!(output, "{} ", c)?,
 
@@ -68,7 +67,7 @@ impl<'a> Renderer<'a> {
     }
 
     /// Emit a newline when nested
-    fn nested_nl(&mut self) -> Result<bool, Error> {
+    fn nested_nl(&mut self) -> anyhow::Result<bool> {
         if self.indent > 0 {
             self.nl()?;
             Ok(true)
@@ -78,7 +77,7 @@ impl<'a> Renderer<'a> {
     }
 
     /// Emit a newline, and handle indentation and possible leading chars.
-    fn nl(&mut self) -> Result<(), Error> {
+    fn nl(&mut self) -> anyhow::Result<()> {
         writeln!(self.output, "")?;
 
         if let Some(c) = self.leading {
@@ -90,7 +89,7 @@ impl<'a> Renderer<'a> {
     }
 
     /// Sometimes text has newlines in it. This translates the newlines to calls to `self.nl`.
-    fn nl_str(&mut self, nls: &str) -> Result<(), Error> {
+    fn nl_str(&mut self, nls: &str) -> anyhow::Result<()> {
         let mut lines = nls.lines();
 
         if let Some(line) = lines.next() {
@@ -105,14 +104,14 @@ impl<'a> Renderer<'a> {
         Ok(())
     }
 
-    fn leading(&mut self) -> Result<(), Error> {
+    fn leading(&mut self) -> anyhow::Result<()> {
         if let Some(c) = self.leading {
             write!(self.output, "{} ", c)?;
         }
         Ok(())
     }
 
-    fn sep(&mut self) -> Result<(), Error> {
+    fn sep(&mut self) -> anyhow::Result<()> {
         match self.sep {
             SepMode::Join => Ok(()),
             SepMode::NewLine => self.nl(),
@@ -123,7 +122,7 @@ impl<'a> Renderer<'a> {
         }
     }
 
-    fn render_indent(&mut self) -> Result<(), Error> {
+    fn render_indent(&mut self) -> anyhow::Result<()> {
         write!(self.output, "{:indent$}", "", indent = self.indent * 2)?;
         Ok(())
     }
@@ -149,7 +148,7 @@ impl<'a> Renderer<'a> {
     }
 
     /// Render a group of children from a single node.
-    fn render_children<'b>(&mut self, children: &Doc<'b>) -> Result<(), Error> {
+    fn render_children<'b>(&mut self, children: &Doc<'b>) -> anyhow::Result<()> {
         if let Some(child) = children.first() {
             self.render_node(child)?;
 
@@ -163,7 +162,7 @@ impl<'a> Renderer<'a> {
     }
 
     /// Render a single node, and all of its children.
-    fn render_node<'b>(&mut self, child: &Node<'b>) -> Result<(), Error> {
+    fn render_node<'b>(&mut self, child: &Node<'b>) -> anyhow::Result<()> {
         match child {
             Node::Node { tag, children } => self.render_nested(tag, children)?,
 
@@ -207,7 +206,7 @@ impl<'a> Renderer<'a> {
     }
 
     /// Render a nested node. The tag indicates the type of node that contains the children.
-    fn render_nested<'b>(&mut self, tag: &Tag<'b>, children: &Doc<'b>) -> Result<(), Error> {
+    fn render_nested<'b>(&mut self, tag: &Tag<'b>, children: &Doc<'b>) -> anyhow::Result<()> {
         match tag {
             Tag::Paragraph => {
                 let sep = self.set_sep(SepMode::Join);

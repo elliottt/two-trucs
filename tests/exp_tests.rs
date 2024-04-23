@@ -1,10 +1,6 @@
-extern crate colored_diff;
-extern crate failure;
-
-use failure::Error;
 use two_trucs::rewrite;
 
-fn main() -> Result<(), Error> {
+fn main() -> anyhow::Result<()> {
     let mut errors = 0;
     let mut failed = 0;
     let mut passed = 0;
@@ -43,7 +39,7 @@ fn main() -> Result<(), Error> {
     Ok(())
 }
 
-fn exp_test(path: &std::path::Path) -> Result<bool, Error> {
+fn exp_test(path: &std::path::Path) -> anyhow::Result<bool> {
     println!("{}", path.display());
 
     let name = path.file_name().expect("Invalid test name");
@@ -82,12 +78,12 @@ fn exp_test(path: &std::path::Path) -> Result<bool, Error> {
     Ok(sorted_res && next_res)
 }
 
-fn test_sort(path: &std::path::Path, input: &str, exp: &std::path::Path) -> Result<bool, Error> {
+fn test_sort(path: &std::path::Path, input: &str, exp: &std::path::Path) -> anyhow::Result<bool> {
     let expected = &std::fs::read_to_string(exp)?;
     compare_output(&format!("sort: {}", path.display()), None, input, expected)
 }
 
-fn test_next(path: &std::path::Path, input: &str, exp: &std::path::Path) -> Result<bool, Error> {
+fn test_next(path: &std::path::Path, input: &str, exp: &std::path::Path) -> anyhow::Result<bool> {
     let expected = &std::fs::read_to_string(exp)?;
     compare_output(
         &format!("next: {}", path.display()),
@@ -102,7 +98,7 @@ fn compare_output(
     opt_title: Option<String>,
     input: &str,
     expected: &str,
-) -> Result<bool, Error> {
+) -> anyhow::Result<bool> {
     let mut buf = Vec::new();
     rewrite::rewrite(opt_title, input, &mut buf)?;
     let actual = std::str::from_utf8(&buf)?;

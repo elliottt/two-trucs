@@ -1,5 +1,4 @@
 use clap::Parser;
-use failure::Error;
 
 use std::{
     fs::File,
@@ -35,7 +34,7 @@ struct Options {
     input: Option<String>,
 }
 
-fn main() -> Result<(), Error> {
+fn main() -> anyhow::Result<()> {
     let options = Options::parse();
 
     let mut handle = open_input(options.input.as_ref())?;
