@@ -1,6 +1,9 @@
 
 # Today
 
+This shows how incomplete items in other H1 sections will all migrate into the
+into the H1 section of the next day
+
 ## First
 
 This illustrates how `C` will bubble up to the next day, because it contains a
@@ -48,9 +51,3 @@ Here's a second todo list
 * [x] A
 
 # Bugs
-
-This shows how empty list headings aren't removed when all list items get moved
-
-## Empty Header
-
-## Second List

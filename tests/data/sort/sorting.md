@@ -30,7 +30,8 @@ Here's a second todo list
 
 # Bugs
 
-This shows how empty list headings aren't removed when all list items get moved
+This shows how incomplete items in other H1 sections will all migrate into the
+into the H1 section of the next day
 
 ## Empty Header
 
