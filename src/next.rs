@@ -7,10 +7,12 @@ pub fn start_next_day<'a>(doc: Doc<'a>, day_title: &str) -> Doc<'a> {
     buf.top.push(make_next_day(day_title));
 
     for range in day_ranges(&doc) {
-        let stats = doc[range.clone()].iter().fold(TodoStats::default(), |mut acc, node| {
-            acc += num_incomplete(node);
-            acc
-        });
+        let stats = doc[range.clone()]
+            .iter()
+            .fold(TodoStats::default(), |mut acc, node| {
+                acc += num_incomplete(node);
+                acc
+            });
 
         if stats.incomplete == 0 {
             buf.old.extend(doc[range.clone()].iter().cloned());
